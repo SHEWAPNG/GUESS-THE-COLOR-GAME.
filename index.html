@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Guessing Game</title>
+  <style>
+    .container {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      margin-top: 50px;
+    }
+
+    #color-box {
+      width: 150px;
+      height: 150px;
+      margin: 20px auto;
+      display: none; /* Initially hidden */
+      border: 2px solid black;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #feedback {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    #attempts {
+      font-size: 16px;
+      margin-top: 5px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Color Guessing Game</h1>
+    <p>Guess the hidden color! You have three attempts. Type the color name and see if you're correct.</p>
+
+    <!-- Input Box -->
+    <input type="text" id="color-input" placeholder="Type a color name here..." />
+    <button id="check-color">Submit Guess</button>
+
+    <!-- Feedback Section -->
+    <p id="feedback"></p>
+
+    <!-- Attempts Left -->
+    <p id="attempts"></p>
+
+    <!-- Hidden Color Box -->
+    <div id="color-box"></div>
+
+    <button id="new-game">Start New Game</button>
+  </div>
+
+  <script>
+    // List of valid color names
+    const colorNames = [
+      "red", "blue", "green", "yellow", "purple",
+      "orange", "pink", "brown", "black", "white"
+    ];
+
+    // DOM Elements
+    const colorInput = document.getElementById("color-input");
+    const checkColorButton = document.getElementById("check-color");
+    const feedback = document.getElementById("feedback");
+    const colorBox = document.getElementById("color-box");
+    const newGameButton = document.getElementById("new-game");
+    const attemptsDisplay = document.getElementById("attempts");
+
+    // Game State Variables
+    let correctColor;
+    let attemptsLeft;
+    let revealTimeout; // Timeout to hide the color box
+
+    // Function to start a new game
+    function startNewGame() {
+      // Clear any existing timeout to hide the color box
+      clearTimeout(revealTimeout);
+
+      // Pick a random color from the list
+      correctColor = colorNames[Math.floor(Math.random() * colorNames.length)];
+      console.log(`Correct Color: ${correctColor}`); // For debugging purposes
+
+      // Reset attempts
+      attemptsLeft = 3;
+
+      // Reset the UI
+      feedback.textContent = "";
+      feedback.style.color = "black";
+      colorInput.value = "";
+      colorBox.style.display = "none";
+      colorBox.style.backgroundColor = "transparent";
+      attemptsDisplay.textContent = `Attempts Left: ${attemptsLeft}`;
+      colorInput.disabled = false;
+      checkColorButton.disabled = false;
+    }
+
+    // Function to check the user's guess
+    function checkGuess() {
+      const userGuess = colorInput.value.trim().toLowerCase();
+
+      if (!userGuess) {
+        feedback.textContent = "Please enter a color name!";
+        feedback.style.color = "orange";
+        return;
+      }
+
+      if (userGuess === correctColor) {
+        feedback.textContent = "Correct! 🎉 The color is revealed below.";
+        feedback.style.color = "green";
+
+        // Show the color box with the correct color
+        colorBox.style.display = "block";
+        colorBox.style.backgroundColor = correctColor;
+
+        // Hide the color box after 3 seconds
+        revealTimeout = setTimeout(() => {
+          colorBox.style.display = "none";
+        }, 3000);
+
+        // Disable input and button
+        colorInput.disabled = true;
+        checkColorButton.disabled = true;
+      } else {
+        // Decrement attempts and provide feedback
+        attemptsLeft -= 1;
+        if (attemptsLeft > 0) {
+          feedback.textContent = `Wrong guess! Try again.`;
+          feedback.style.color = "red";
+          attemptsDisplay.textContent = `Attempts Left: ${attemptsLeft}`;
+        } else {
+          // No attempts left, reveal the correct color
+          feedback.textContent = `Out of attempts! The correct color was ${correctColor}.`;
+          feedback.style.color = "red";
+
+          // Show the color box with the correct color
+          colorBox.style.display = "block";
+          colorBox.style.backgroundColor = correctColor;
+
+          // Hide the color box after 3 seconds
+          revealTimeout = setTimeout(() => {
+            colorBox.style.display = "none";
+          }, 3000);
+
+          // Disable input and button
+          colorInput.disabled = true;
+          checkColorButton.disabled = true;
+        }
+      }
+    }
+
+    // Add event listeners
+    checkColorButton.addEventListener("click", checkGuess);
+    newGameButton.addEventListener("click", startNewGame);
+
+    // Start the first game
+    startNewGame();
+  </script>
+</body>
+</html>
